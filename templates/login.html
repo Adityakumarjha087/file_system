@@ -1,0 +1,190 @@
+{% extends 'base_auth.html' %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Sign in to your account
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Or
+                <a href="{% url 'signup' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                    create a new account
+                </a>
+            </p>
+        </div>
+        
+        <!-- Error Messages -->
+        {% if messages %}
+        <div class="rounded-md bg-red-50 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Token Expired Message -->
+        {% if request.GET.expired %}
+        <div class="rounded-md bg-yellow-50 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-yellow-800">Your session has expired. Please log in again.</h3>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <form class="mt-8 space-y-6" method="POST" id="loginForm" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="hidden" name="remember" value="true">
+            <input type="hidden" name="next" value="{{ next }}">
+            <div class="rounded-md shadow-sm -space-y-px">
+                <!-- Error container -->
+                {% if form.non_field_errors %}
+                <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg">
+                    <span class="font-medium">Error:</span>
+                    {% for error in form.non_field_errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div>
+                    <label for="username" class="sr-only">Username</label>
+                    <input id="username" name="username" type="text" required 
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
+                           placeholder="Username">
+                </div>
+                <div>
+                    <label for="password" class="sr-only">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required 
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
+                           placeholder="Password">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input id="remember-me" name="remember-me" type="checkbox" 
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+                        Remember me
+                    </label>
+                </div>
+
+                <div class="text-sm">
+                    <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
+                        Forgot your password?
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" id="loginButton"
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <svg class="h-5 w-5 text-blue-500 group-hover:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    <span id="buttonText">Sign in</span>
+                </button>
+            </div>
+        </form>
+        <div class="mt-6">
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-gray-50 text-gray-500">
+                        Or continue with
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-2 gap-3">
+                <div>
+                    <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Sign in with Google</span>
+                        <i class="fab fa-google text-red-500"></i>
+                    </a>
+                </div>
+
+                <div>
+                    <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Sign in with GitHub</span>
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    const buttonText = document.getElementById('buttonText');
+    const errorContainer = document.getElementById('errorContainer');
+    
+    if (loginForm) {
+        // Simple client-side validation
+        loginForm.addEventListener('submit', function(e) {
+            const username = document.getElementById('username')?.value;
+            const password = document.getElementById('password')?.value;
+            
+            if (!username || !password) {
+                e.preventDefault();
+                if (errorContainer) {
+                    const errorMessage = document.getElementById('errorMessage');
+                    if (errorMessage) {
+                        errorMessage.textContent = 'Please enter both username and password';
+                        errorContainer.classList.remove('hidden');
+                    }
+                }
+                return false;
+            }
+            
+            // Show loading state
+            if (loginButton && buttonText) {
+                loginButton.disabled = true;
+                buttonText.textContent = 'Signing in...';
+            }
+            
+            // Form will submit normally after validation
+            return true;
+        });
+        
+        // Clear error when typing
+        const inputs = loginForm.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (errorContainer) {
+                    errorContainer.classList.add('hidden');
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

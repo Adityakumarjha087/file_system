@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Create your account
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Or
+                <a href="{% url 'login' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                    sign in to your account
+                </a>
+            </p>
+        </div>
+        
+        {% if messages %}
+        <div class="rounded-md bg-red-50 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <form class="mt-8 space-y-6" method="POST" action="{% url 'signup' %}">
+            {% csrf_token %}
+            <div class="rounded-md shadow-sm -space-y-px">
+                <div>
+                    <label for="username" class="sr-only">Username</label>
+                    <input id="username" name="username" type="text" required 
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
+                           placeholder="Username" value="{{ request.POST.username }}">
+                </div>
+                <div>
+                    <label for="email" class="sr-only">Email address</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required 
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
+                           placeholder="Email address" value="{{ request.POST.email }}">
+                </div>
+                <div>
+                    <label for="password1" class="sr-only">Password</label>
+                    <input id="password1" name="password1" type="password" autocomplete="new-password" required 
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
+                           placeholder="Password">
+                </div>
+                <div>
+                    <label for="password2" class="sr-only">Confirm Password</label>
+                    <input id="password2" name="password2" type="password" autocomplete="new-password" required 
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
+                           placeholder="Confirm Password">
+                </div>
+                <div class="flex items-center mt-4">
+                    <input id="is_admin" name="is_admin" type="checkbox" 
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                           {% if request.POST.is_admin == 'on' %}checked{% endif %}>
+                    <label for="is_admin" class="ml-2 block text-sm text-gray-900">
+                        Register as Admin (requires admin token)
+                    </label>
+                </div>
+                <div id="adminTokenContainer" class="{% if not request.POST.is_admin %}hidden{% endif %}">
+                    <label for="admin_token" class="sr-only">Admin Token</label>
+                    <input id="admin_token" name="admin_token" type="password" 
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm mt-2" 
+                           placeholder="Enter admin token" value="{{ request.POST.admin_token }}"
+                           {% if request.POST.is_admin %}required{% endif %}>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input id="terms" name="terms" type="checkbox" required
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="terms" class="ml-2 block text-sm text-gray-900">
+                        I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms</a> and <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" 
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <svg class="h-5 w-5 text-blue-500 group-hover:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    Create Account
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Toggle admin token field
+document.addEventListener('DOMContentLoaded', function() {
+    const isAdminCheckbox = document.getElementById('is_admin');
+    const adminTokenContainer = document.getElementById('adminTokenContainer');
+    const adminTokenInput = document.getElementById('admin_token');
+
+    if (isAdminCheckbox && adminTokenContainer && adminTokenInput) {
+        isAdminCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                adminTokenContainer.classList.remove('hidden');
+                adminTokenInput.required = true;
+            } else {
+                adminTokenContainer.classList.add('hidden');
+                adminTokenInput.required = false;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}
